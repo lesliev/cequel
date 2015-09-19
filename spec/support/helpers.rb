@@ -106,6 +106,10 @@ module Cequel
           at(time, 999)
       end
 
+      def time_uuid(time)
+        Cassandra::TimeUuid::Generator.new.at(time)
+      end
+
       def cequel
         Helpers.cequel
       end

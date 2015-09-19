@@ -477,6 +477,37 @@ describe Cequel::Record::RecordSet do
       expect(PublishedPost['cassandra'].after(now - 3.minutes).map(&:permalink)).
         to eq(%w(cequel4 cequel3 cequel2))
     end
+
+    it 'should query Time range for Timeuuid key 2' do
+      cassandra2_records = [
+        PublishedPost.new(
+          :blog_subdomain => 'cassandra2',
+          :published_at => time_uuid(Time.new(2015, 10, 10, 11, 12, 13)),
+          :permalink => "11:12:13"
+        ),
+
+        PublishedPost.new(
+          :blog_subdomain => 'cassandra2',
+          :published_at => time_uuid(Time.new(2015, 10, 10, 11, 12, 14)),
+          :permalink => "11:12:14"
+        ),
+
+
+        PublishedPost.new(
+          :blog_subdomain => 'cassandra2',
+          :published_at => time_uuid(Time.new(2015, 10, 10, 11, 12, 15)),
+          :permalink => "11:12:15"
+        )
+      ]
+
+      cassandra2_records.each(&:save!)
+
+      expect(PublishedPost['cassandra2'].map(&:permalink)).
+        to eq(%w(11:12:15 11:12:14 11:12:13))
+
+      expect(PublishedPost['cassandra2'].after(Time.new(2015, 10, 10, 11, 12, 13)).map(&:permalink)).
+        to eq(%w(11:12:15 11:12:14))
+    end
   end
 
   describe '#from' do
